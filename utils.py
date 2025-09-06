@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 from database import FireData
-
+from sqlalchemy.exc import SQLAlchemyError
 # list of valid formats for santa clara county
 valid_county = ["Santa Clara", "Santa Clara County", "County of Santa Clara", "SCC", "SCL"]
 
@@ -19,7 +19,7 @@ def parse_datetime(date_string: str | None) -> datetime | None:
 def proceess_fire_data(fire: dict, db: Session):
     try:
         # make sure to only look at data from Santa Clara County
-        if fire.get("County") not in valid_county:
+        if fire.get("County").lower() not in map(str.lower, valid_county):
             return
 
         # db.merge() function handles either creating a new record or updating an existing one based on the primary key (id).
@@ -45,6 +45,11 @@ def proceess_fire_data(fire: dict, db: Session):
 
         db.merge(fire_instance)
 
-    except (ValueError, TypeError) as e:
-        # TODO: Handle this better
-        print(f"Skipping record due to data error: {e} - ID: {fire.get('UniqueId')}")
+
+    except (ValueError, TypeError, AttributeError) as e:
+        print(f"Data conversion failed for ID: {fire.get('UniqueId')}")
+        raise
+    
+    except SQLAlchemyError as e:
+        print(f"Database error during merge for ID: {fire.get('UniqueId')}")
+        raise 
