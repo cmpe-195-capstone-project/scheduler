@@ -26,3 +26,20 @@ Refer to the main backend README for setup and deployment instructions.
 
 👉 [EmberAlert Backend README](https://github.com/cmpe-195-capstone-project/backend)
 
+## Code Structure
+```shell
+scheduler/
+├── .dockerignore          # Files to exclude from Docker build
+├── .env                   # Environment variable configuration
+├── .gitignore
+│
+├── config.py              # Scheduler configuration (.env variables)
+├── database.py            # Database connection + model
+├── utils.py               # Helper functions (parsing time, process fire)
+│
+├── Dockerfile             # Scheduler container definition
+├── main.py                # Scheduler entry point (polling + execution loop)
+│
+├── README.md
+├── requirements.txt       # Python dependencies
+```
